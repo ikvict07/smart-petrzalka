@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Entity
 class Price {
@@ -21,10 +21,10 @@ class Price {
     var priceMultiplier: Double? = null
 
     @Column(name = "start_time", nullable = false)
-    var startTime: LocalDateTime? = null
+    var startTime: LocalTime? = null
 
     @Column(name = "end_time", nullable = false)
-    var endTime: LocalDateTime? = null
+    var endTime: LocalTime? = null
 
     @Column(name = "week_days", nullable = true)
     @OneToMany(mappedBy = "price")

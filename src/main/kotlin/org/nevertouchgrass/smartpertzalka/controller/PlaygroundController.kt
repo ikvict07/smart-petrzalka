@@ -4,6 +4,7 @@ import org.nevertouchgrass.smartpertzalka.db.entity.Playground
 import org.nevertouchgrass.smartpertzalka.db.repository.PlaygroundRepository
 import org.nevertouchgrass.smartpertzalka.dto.OpenHours
 import org.nevertouchgrass.smartpertzalka.dto.request.AddDefaultPriceDTO
+import org.nevertouchgrass.smartpertzalka.dto.request.AddHoursForDayDTO
 import org.nevertouchgrass.smartpertzalka.dto.request.GetHoursForDayDTO
 import org.nevertouchgrass.smartpertzalka.dto.responce.PlaygroundDTO
 import org.nevertouchgrass.smartpertzalka.service.PlaygroundService
@@ -31,7 +32,7 @@ class PlaygroundController(
     }
 
 //    @GetMapping("/")
-//    fun getFreeHours(@RequestBody playgroundName: String): ResponseEntity<List<LocalDateTime>> {
+//    fun getFreeHours(@RequestBody playgroundName: String): ResponseEntity<List<LocalTime>> {
 //        return ResponseEntity.ok()
 //    }
 
@@ -46,7 +47,7 @@ class PlaygroundController(
         return ResponseEntity.ok(playgroundDTO)
     }
 
-    @PostMapping("/add-time")
+    @PostMapping("/add-time-default")
     fun addDefaultPrice(
         @RequestBody addDefaultPriceDTO: AddDefaultPriceDTO
     ): ResponseEntity<PlaygroundDTO> {
@@ -57,9 +58,19 @@ class PlaygroundController(
             addDefaultPriceDTO.to,
             addDefaultPriceDTO.price
         )
-
-        playgroundRepository.save(playground)
         return ResponseEntity.ok(PlaygroundDTO(playground.name!!, playground.defaultPrice!!, playground.maxCapacity!!))
+    }
+
+    @PostMapping("/add-hours-for-day")
+    fun addHoursForDay(@RequestBody requestBody: AddHoursForDayDTO): ResponseEntity<List<OpenHours>> {
+        val playground = playgroundService.addOpenHoursForDay(
+            requestBody.playgroundName,
+            requestBody.day,
+            OpenHours(requestBody.from, requestBody.to),
+            requestBody.price,
+            requestBody.isClosed
+        ) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(playgroundService.getPlaygroundOpenHoursForDay(requestBody.playgroundName, requestBody.day))
     }
 
     @PostMapping("/get-hours-for-day")

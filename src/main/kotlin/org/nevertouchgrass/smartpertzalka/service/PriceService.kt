@@ -7,7 +7,7 @@ import org.nevertouchgrass.smartpertzalka.db.entity.WeekDayEnum
 import org.nevertouchgrass.smartpertzalka.db.repository.PriceRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Service
 class PriceService(
@@ -32,9 +32,10 @@ class PriceService(
     fun addPriceForDay(
         day: LocalDate,
         playground: Playground,
-        startTime: LocalDateTime,
-        endTime: LocalDateTime,
-        priceMultiplier: Double
+        startTime: LocalTime,
+        endTime: LocalTime,
+        priceMultiplier: Double,
+        isClosed: Boolean
     ): Price {
         val price = Price()
         price.day = day
@@ -42,15 +43,15 @@ class PriceService(
         price.startTime = startTime
         price.endTime = endTime
         price.priceMultiplier = priceMultiplier
-        price.isClosed = false
+        price.isClosed = isClosed
         return priceRepository.save(price)
     }
 
     fun addPriceForWeekDay(
         dayOfWeeks: List<WeekDayEnum>,
         playground: Playground,
-        startTime: LocalDateTime,
-        endTime: LocalDateTime,
+        startTime: LocalTime,
+        endTime: LocalTime,
         priceMultiplier: Double
     ): Price {
         val price = Price()
@@ -74,7 +75,7 @@ class PriceService(
     }
 
     fun addDefaultPrice(
-        playground: Playground, startTime: LocalDateTime, endTime: LocalDateTime, priceMultiplier: Double
+        playground: Playground, startTime: LocalTime, endTime: LocalTime, priceMultiplier: Double
     ): Price {
         val price = Price()
         price.playground = playground

@@ -1,5 +1,6 @@
 package org.nevertouchgrass.smartpertzalka.service
 
+import org.nevertouchgrass.smartpertzalka.db.entity.Playground
 import org.nevertouchgrass.smartpertzalka.db.entity.WeekDayEnum
 import org.nevertouchgrass.smartpertzalka.db.entity.toWeekDayEnum
 import org.nevertouchgrass.smartpertzalka.db.repository.PlaygroundRepository
@@ -173,9 +174,10 @@ class PlaygroundService(
         return result
     }
 
-    fun addOpenHoursForDay(playgroundName: String, day: LocalDate, openHours: OpenHours, priceMultiplier: Double) {
-        val playground = playgroundRepository.findByName(playgroundName) ?: return
-        priceService.addPriceForDay(day, playground, openHours.from, openHours.to, priceMultiplier)
+    fun addOpenHoursForDay(playgroundName: String, day: LocalDate, openHours: OpenHours, priceMultiplier: Double, isClosed: Boolean): Playground? {
+        val playground = playgroundRepository.findByName(playgroundName) ?: return null
+        priceService.addPriceForDay(day, playground, openHours.from, openHours.to, priceMultiplier, isClosed)
+        return playground
     }
 
     fun addOpenHoursForWeekDays(
@@ -188,8 +190,9 @@ class PlaygroundService(
         priceService.addPriceForWeekDay(weekDays, playground, openHours.from, openHours.to, priceMultiplier)
     }
 
-    fun addDefaultOpenHours(playgroundName: String, openHours: OpenHours, priceMultiplier: Double) {
-        val playground = playgroundRepository.findByName(playgroundName) ?: return
+    fun addDefaultOpenHours(playgroundName: String, openHours: OpenHours, priceMultiplier: Double): Playground? {
+        val playground = playgroundRepository.findByName(playgroundName) ?: return null
         priceService.addDefaultPrice(playground, openHours.from, openHours.to, priceMultiplier)
+        return playground
     }
 }

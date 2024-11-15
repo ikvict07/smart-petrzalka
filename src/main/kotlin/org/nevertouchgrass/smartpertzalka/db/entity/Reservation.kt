@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Entity
 class Reservation {
@@ -19,10 +19,10 @@ class Reservation {
     var id: Long? = null
 
     @Column(name = "start_time", nullable = false)
-    var startTime: LocalDateTime? = null
+    var startTime: LocalTime? = null
 
     @Column(name = "end_time", nullable = false)
-    var endTime: LocalDateTime? = null
+    var endTime: LocalTime? = null
 
     @ManyToOne
     @JoinColumn(name = "playground_id", nullable = false)
