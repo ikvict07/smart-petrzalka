@@ -5,6 +5,7 @@ import org.nevertouchgrass.smartpertzalka.db.repository.PlaygroundRepository
 import org.nevertouchgrass.smartpertzalka.dto.OpenHours
 import org.nevertouchgrass.smartpertzalka.dto.request.AddDefaultPriceDTO
 import org.nevertouchgrass.smartpertzalka.dto.request.AddHoursForDayDTO
+import org.nevertouchgrass.smartpertzalka.dto.request.AddHoursForWeekDayDTO
 import org.nevertouchgrass.smartpertzalka.dto.request.GetHoursForDayDTO
 import org.nevertouchgrass.smartpertzalka.dto.responce.PlaygroundDTO
 import org.nevertouchgrass.smartpertzalka.service.PlaygroundService
@@ -51,13 +52,11 @@ class PlaygroundController(
     fun addDefaultPrice(
         @RequestBody addDefaultPriceDTO: AddDefaultPriceDTO
     ): ResponseEntity<PlaygroundDTO> {
-        val playground = playgroundRepository.findByName(addDefaultPriceDTO.playgroundName) ?: return ResponseEntity.notFound().build()
-        priceService.addDefaultPrice(
-            playground,
-            addDefaultPriceDTO.from,
-            addDefaultPriceDTO.to,
+        val playground = playgroundService.addDefaultOpenHours(
+            addDefaultPriceDTO.playgroundName,
+            OpenHours(addDefaultPriceDTO.from, addDefaultPriceDTO.to),
             addDefaultPriceDTO.price
-        )
+        ) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(PlaygroundDTO(playground.name!!, playground.defaultPrice!!, playground.maxCapacity!!))
     }
 
@@ -70,11 +69,34 @@ class PlaygroundController(
             requestBody.price,
             requestBody.isClosed
         ) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(playgroundService.getPlaygroundOpenHoursForDay(requestBody.playgroundName, requestBody.day))
+        return ResponseEntity.ok(
+            playgroundService.getPlaygroundOpenHoursForDay(
+                requestBody.playgroundName,
+                requestBody.day
+            )
+        )
     }
 
     @PostMapping("/get-hours-for-day")
     fun getHoursForDay(@RequestBody requestBody: GetHoursForDayDTO): ResponseEntity<List<OpenHours>> {
-        return ResponseEntity.ok(playgroundService.getPlaygroundOpenHoursForDay(requestBody.playgroundName, requestBody.date))
+        return ResponseEntity.ok(
+            playgroundService.getPlaygroundOpenHoursForDay(
+                requestBody.playgroundName,
+                requestBody.date
+            )
+        )
+    }
+
+    @PostMapping("/add-hours-for-week-days")
+    fun addHoursForWeekDays(@RequestBody requestBody: AddHoursForWeekDayDTO): ResponseEntity<PlaygroundDTO> {
+        val playground = playgroundService.addOpenHoursForWeekDays(
+            requestBody.playgroundName,
+            requestBody.weekDays,
+            OpenHours(requestBody.from, requestBody.to),
+            requestBody.priceMultiplier
+        ) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(
+            PlaygroundDTO(playground.name!!, playground.defaultPrice!!, playground.maxCapacity!!)
+        )
     }
 }

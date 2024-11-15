@@ -5,6 +5,7 @@ import org.nevertouchgrass.smartpertzalka.db.entity.Price
 import org.nevertouchgrass.smartpertzalka.db.entity.WeekDay
 import org.nevertouchgrass.smartpertzalka.db.entity.WeekDayEnum
 import org.nevertouchgrass.smartpertzalka.db.repository.PriceRepository
+import org.nevertouchgrass.smartpertzalka.db.repository.WeekDayRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalTime
@@ -12,6 +13,7 @@ import java.time.LocalTime
 @Service
 class PriceService(
     private val priceRepository: PriceRepository,
+    private val weekDayRepository: WeekDayRepository,
 ) {
     fun getPriceForDay(day: LocalDate, playground: Playground): List<Price> {
         return priceRepository.findByDayAndPlayground(day, playground)
@@ -54,24 +56,28 @@ class PriceService(
         endTime: LocalTime,
         priceMultiplier: Double
     ): Price {
-        val price = Price()
-        price.playground = playground
-        price.startTime = startTime
-        price.endTime = endTime
-        price.priceMultiplier = priceMultiplier
-        price.isClosed = false
-        price.weekDays = mutableListOf()
+        // Создаем объект Price
+        val price = Price().apply {
+            this.playground = playground
+            this.startTime = startTime
+            this.endTime = endTime
+            this.priceMultiplier = priceMultiplier
+            this.isClosed = false
+        }
 
-        val priceFromDb = priceRepository.save(price)
-        price.weekDays!!.addAll(
-            dayOfWeeks.map {
-                val weekDay = WeekDay()
-                weekDay.day = it
-                weekDay.price = priceFromDb
-                weekDay
+        val savedPrice = priceRepository.save(price)
+
+        val weekDays = dayOfWeeks.map { dayOfWeek ->
+            WeekDay().apply {
+                this.day = dayOfWeek
+                this.price = savedPrice
             }
-        )
-        return priceRepository.save(price)
+        }
+        weekDayRepository.saveAll(weekDays)
+
+        savedPrice.weekDays = weekDays.toMutableList()
+
+        return priceRepository.save(savedPrice)
     }
 
     fun addDefaultPrice(
