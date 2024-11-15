@@ -42,4 +42,8 @@ class User {
 
     @Column(name = "phone_number", nullable = false)
     var phoneNumber: String? = null
+
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    var reservations: MutableList<Reservation>? = null
 }
