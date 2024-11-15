@@ -1,6 +1,4 @@
-package org.nevertouchgrass.smartpertzalka.dto
-
-import org.nevertouchgrass.smartpertzalka.db.entity.UserRole
+package org.nevertouchgrass.smartpertzalka.dto.request
 
 data class RegisterDTO(
     val name: String,

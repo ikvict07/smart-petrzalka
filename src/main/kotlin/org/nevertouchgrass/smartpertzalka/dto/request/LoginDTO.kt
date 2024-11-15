@@ -1,4 +1,4 @@
-package org.nevertouchgrass.smartpertzalka.dto
+package org.nevertouchgrass.smartpertzalka.dto.request
 
 data class LoginDTO(
     val email: String,

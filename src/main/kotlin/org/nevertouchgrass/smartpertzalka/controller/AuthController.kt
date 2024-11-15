@@ -1,7 +1,7 @@
 package org.nevertouchgrass.smartpertzalka.controller
 
-import org.nevertouchgrass.smartpertzalka.dto.LoginDTO
-import org.nevertouchgrass.smartpertzalka.dto.RegisterDTO
+import org.nevertouchgrass.smartpertzalka.dto.request.LoginDTO
+import org.nevertouchgrass.smartpertzalka.dto.request.RegisterDTO
 import org.nevertouchgrass.smartpertzalka.service.AuthService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping

@@ -4,7 +4,7 @@ import org.nevertouchgrass.smartpertzalka.db.entity.User
 import org.nevertouchgrass.smartpertzalka.db.entity.UserRole
 import org.nevertouchgrass.smartpertzalka.db.entity.UserRolesEntity
 import org.nevertouchgrass.smartpertzalka.db.repository.UserRepository
-import org.nevertouchgrass.smartpertzalka.dto.RegisterDTO
+import org.nevertouchgrass.smartpertzalka.dto.request.RegisterDTO
 import org.nevertouchgrass.smartpertzalka.jwt.JwtTokenProvider
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service

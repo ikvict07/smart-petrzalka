@@ -25,5 +25,9 @@ class Playground {
     @Column(name = "max_capacity", nullable = false)
     var maxCapacity: Int? = null
 
+    @OneToMany(mappedBy = "playground", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    var prices: MutableList<Price>? = null
 
+    @Column(name = "default_price", nullable = false)
+    var defaultPrice: Double? = null
 }

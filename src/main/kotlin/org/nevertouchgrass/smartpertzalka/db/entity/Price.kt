@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,13 +26,16 @@ class Price {
     @Column(name = "end_time", nullable = false)
     var endTime: LocalDateTime? = null
 
-    @Column(name = "week_days", nullable = false)
+    @Column(name = "week_days", nullable = true)
     @OneToMany(mappedBy = "price")
     var weekDays: MutableList<WeekDay>? = null
 
-    @Column(name= "day", nullable = false)
+    @Column(name= "day", nullable = true)
     var day: LocalDate? = null
 
     @Column(name = "is_closed", nullable = false)
     var isClosed: Boolean? = null
+
+    @ManyToOne
+    var playground: Playground? = null
 }
