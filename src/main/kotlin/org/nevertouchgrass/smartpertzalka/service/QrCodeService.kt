@@ -29,8 +29,3 @@ class QrCodeService {
         MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path)
     }
 }
-
-fun main() {
-    val qrCodeService = QrCodeService()
-    qrCodeService.saveQRCodeToFile("Hello!", 350, 350, "qr-code.png")
-}

@@ -36,8 +36,3 @@ class RaspService {
         println("Received reservation: $reservation")
     }
 }
-
-fun main() {
-    val raspService = RaspService()
-    raspService.turnOffLight()
-}
