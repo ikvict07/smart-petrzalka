@@ -8,24 +8,26 @@ import org.springframework.web.client.RestClient
 
 @Service
 class RaspService {
-    val client = OkHttpClient()
-
-
-
 
     fun turnOnLight() {
+        val client = OkHttpClient()
         val request = Request.Builder()
             .url("http://192.168.4.1:8080?light=1")
             .build()
-        client.newCall(request).execute()
+        client.newCall(request).execute().use {
+            println(it.isSuccessful)
+        }
         println("Light is on")
     }
 
     fun turnOffLight() {
+        val client = OkHttpClient()
         val request = Request.Builder()
             .url("http://192.168.4.1:8080?light=0")
             .build()
-        client.newCall(request).execute()
+        client.newCall(request).execute().use {
+            println(it.isSuccessful)
+        }
         println("Light is off")
     }
 
