@@ -38,6 +38,8 @@ dependencies {
     implementation("com.google.zxing:core:3.5.1")
     implementation("com.google.zxing:javase:3.5.1")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.2")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
 
 }
 
