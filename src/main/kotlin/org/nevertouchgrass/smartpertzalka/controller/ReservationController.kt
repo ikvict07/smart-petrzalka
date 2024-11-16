@@ -70,4 +70,19 @@ class ReservationController(private val reservationService: ReservationService) 
             )
         })
     }
+
+    @PostMapping("/get-qr")
+    fun getQRCode(@RequestBody id: Long): ResponseEntity<ByteArray> {
+        return ResponseEntity.ok(reservationService.getReservationQrCodeById(id))
+    }
+
+    @PostMapping("/cancel")
+    fun cancelReservation(@RequestBody id: Long): ResponseEntity<Boolean> {
+        val result = reservationService.cancelReservation(id)
+        return if (result) {
+            ResponseEntity.ok(true)
+        } else {
+            ResponseEntity.badRequest().build()
+        }
+    }
 }

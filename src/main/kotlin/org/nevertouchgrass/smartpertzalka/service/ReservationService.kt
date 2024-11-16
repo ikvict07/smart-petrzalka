@@ -17,7 +17,8 @@ class ReservationService(
     private val userService: UserService,
     private val balanceService: BalanceService,
     private val qrCodeService: QrCodeService,
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val syncReservationsService: SyncReservationsService
 ) {
 
     fun isTimeAvailable(playgroundName: String, day: LocalDate, startTime: LocalTime, endTime: LocalTime): Boolean {
@@ -73,6 +74,7 @@ class ReservationService(
             qr,
             "qr.png"
         )
+        syncReservationsService.sync()
         return reservation
     }
 
@@ -84,7 +86,7 @@ class ReservationService(
     }
 
     fun getAllReservationsForDay(playgroundName: String, day: LocalDate): List<Reservation> {
-        return reservationRepository.findByDay(day).filter { it.playground?.name == playgroundName }
+        return reservationRepository.findByDay(day).filter { it.playground?.name == playgroundName }.filter { it.status == ReservationStatus.ACTIVE }
     }
 
     fun getFreeTimes(playgroundName: String, day: LocalDate): List<OpenHours> {
@@ -125,5 +127,25 @@ class ReservationService(
             }
         }
         return allHours.filter { it.isAvailable }
+    }
+
+    fun getReservationQrCodeById(reservationId: Long): ByteArray? {
+        val reservation = reservationRepository.findById(reservationId).orElse(null) ?: return null
+        return qrCodeService.generateQRCode(reservation.uuid, 240, 240)
+    }
+
+    fun cancelReservation(id: Long): Boolean {
+        val email = SecurityContextHolder.getContext().authentication.principal as String
+        val user = userService.getUserByEmail(email) ?: return false
+        val reservations = reservationRepository.findByUser(user).filter { it.id == id }.forEach{
+            it.status = ReservationStatus.CANCELLED
+            reservationRepository.save(it)
+        }
+        return true
+    }
+
+
+    fun getAllReservations(): List<Reservation> {
+        return reservationRepository.findAll().toList()
     }
 }

@@ -39,7 +39,6 @@ dependencies {
     implementation("com.google.zxing:javase:3.5.1")
     implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
 
-
 }
 
 kotlin {
