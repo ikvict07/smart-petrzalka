@@ -35,6 +35,10 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.auth0:java-jwt:4.2.1")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.google.zxing:javase:3.5.1")
+    implementation("org.springframework.boot:spring-boot-starter-mail:3.1.5")
+
 
 }
 

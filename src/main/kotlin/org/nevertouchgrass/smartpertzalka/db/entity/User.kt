@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 
 
 @Entity(name = "playground_user")
@@ -46,4 +47,11 @@ class User {
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var reservations: MutableList<Reservation>? = null
+
+    @Column(name = "balance", nullable = false)
+    var balance: Double = 0.0
+
+
+    @OneToOne
+    var creditCard: CreditCard? = null
 }

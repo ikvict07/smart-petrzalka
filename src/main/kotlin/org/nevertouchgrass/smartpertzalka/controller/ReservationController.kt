@@ -7,6 +7,7 @@ import org.nevertouchgrass.smartpertzalka.dto.request.ShowFreeTimeSlotsDTO
 import org.nevertouchgrass.smartpertzalka.dto.responce.ReservationResponseDTO
 import org.nevertouchgrass.smartpertzalka.service.ReservationService
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -47,11 +48,26 @@ class ReservationController(private val reservationService: ReservationService) 
                     it.day!!,
                     it.startTime!!,
                     it.endTime!!,
-                    it.price!!
+                    it.price!!,
+                    it.uuid
                 )
             )
         } ?: run {
             return ResponseEntity.badRequest().build()
         }
+    }
+
+    @GetMapping("/get-reservations")
+    fun getReservations(): ResponseEntity<List<ReservationResponseDTO>> {
+        return ResponseEntity.ok(reservationService.getReservationByUserEmail().map {
+            ReservationResponseDTO(
+                it.playground!!.name!!,
+                it.day!!,
+                it.startTime!!,
+                it.endTime!!,
+                it.price!!,
+                it.uuid
+            )
+        })
     }
 }

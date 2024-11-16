@@ -8,5 +8,6 @@ data class ReservationResponseDTO (
     val day: LocalDate,
     val startTime: LocalTime,
     val endTime: LocalTime,
-    val price: Double
+    val price: Double,
+    val uuid: String
 )

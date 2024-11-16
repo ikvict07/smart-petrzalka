@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.UUID
 
 @Entity
 class Reservation {
@@ -45,4 +46,7 @@ class Reservation {
         value = EnumType.STRING
     )
     var status: ReservationStatus? = null
+
+    @Column(name = "uuid", nullable = true)
+    var uuid: String = UUID.randomUUID().toString()
 }

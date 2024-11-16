@@ -9,20 +9,34 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalTime
 
+
 @Service
 class ReservationService(
     private val reservationRepository: ReservationRepository,
     private val playgroundService: PlaygroundService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val balanceService: BalanceService,
+    private val qrCodeService: QrCodeService,
+    private val emailService: EmailService
 ) {
 
     fun isTimeAvailable(playgroundName: String, day: LocalDate, startTime: LocalTime, endTime: LocalTime): Boolean {
         val freeHours = getFreeTimes(playgroundName, day)
-        return freeHours.any { it.from.isAfterE(startTime) && it.to.isBeforeE(endTime) }
+        return !freeHours.any { it.from.isAfterE(startTime) && it.to.isBeforeE(endTime) }
 
     }
 
-    fun makeReservation(playgroundName: String, day: LocalDate, startTime: LocalTime, endTime: LocalTime): Reservation? {
+    fun getReservationByUserEmail(): List<Reservation> {
+        val user = userService.getUser()
+        return reservationRepository.findByUser(user).sortedBy { it.day }
+    }
+
+    fun makeReservation(
+        playgroundName: String,
+        day: LocalDate,
+        startTime: LocalTime,
+        endTime: LocalTime
+    ): Reservation? {
         if (!isTimeAvailable(playgroundName, day, startTime, endTime)) {
             return null
         }
@@ -39,14 +53,33 @@ class ReservationService(
         val email = SecurityContextHolder.getContext().authentication.principal as String
         val user = userService.getUserByEmail(email) ?: return null
         reservation.user = user
+
+        val price = reservation.price!!
+        val balance = balanceService.getBalance()
+
+        if (balance < price) {
+            return null
+        }
+
+        balanceService.subtractBalance(price)
+
         reservationRepository.save(reservation)
+
+        val qr = qrCodeService.generateQRCode(reservation.uuid, 240, 240)
+        emailService.sendMessageWithAttachment(
+            "antongorobec101@gmail.com",
+            "Reservation",
+            "You have a reservation at ${reservation.playground?.name} on ${reservation.day} from ${reservation.startTime} to ${reservation.endTime}",
+            qr,
+            "qr.png"
+        )
         return reservation
     }
 
     fun getPriceForTime(playgroundName: String, day: LocalDate, startTime: LocalTime, endTime: LocalTime): Double? {
         val playground = playgroundService.getPlaygroundByName(playgroundName) ?: return null
         val freeHours = getFreeTimes(playgroundName, day)
-        val freeHour = freeHours.find { it.from.isAfterE(startTime) && it.to.isBeforeE(endTime) } ?: return null
+        val freeHour = freeHours.find { it.from.isBeforeE(startTime) && it.to.isAfterE(endTime) } ?: return null
         return freeHour.price
     }
 
@@ -68,9 +101,15 @@ class ReservationService(
                 val hourEnd = hour.to
                 if (reservationStart.isBeforeE(hourStart) && reservationEnd.isAfterE(hourEnd)) {
                     hour.isAvailable = false
-                }else if (reservationStart.isBeforeE(hourStart) && reservationEnd.isBeforeE(hourEnd) && reservationEnd.isAfterE(hourStart)) {
+                } else if (reservationStart.isBeforeE(hourStart) && reservationEnd.isBeforeE(hourEnd) && reservationEnd.isAfterE(
+                        hourStart
+                    )
+                ) {
                     hour.from = reservationEnd
-                }else if (reservationStart.isAfterE(hourStart) && reservationEnd.isAfterE(hourEnd) && reservationStart.isBeforeE(hourEnd)) {
+                } else if (reservationStart.isAfterE(hourStart) && reservationEnd.isAfterE(hourEnd) && reservationStart.isBeforeE(
+                        hourEnd
+                    )
+                ) {
                     hour.to = reservationStart
                 } else if (reservationStart.isAfterE(hourStart) && reservationEnd.isBeforeE(hourEnd)) {
                     hour.to = reservationStart
