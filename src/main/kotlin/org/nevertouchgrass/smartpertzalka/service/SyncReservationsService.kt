@@ -1,5 +1,6 @@
 package org.nevertouchgrass.smartpertzalka.service
 
+import org.nevertouchgrass.smartpertzalka.db.entity.Reservation
 import org.nevertouchgrass.smartpertzalka.db.entity.ReservationStatus
 import org.nevertouchgrass.smartpertzalka.db.repository.ReservationRepository
 import org.springframework.stereotype.Service
@@ -46,5 +47,26 @@ class SyncReservationsService(
     fun sync() {
         val reservations = reservationRepository.findAll().filter { it.status == ReservationStatus.ACTIVE }
         reservations.forEach { raspService.receiveReservation(it) }
+
+    }
+
+    fun sync(reservation: Reservation) {
+        raspService.receiveReservation(reservation)
+        scheduler.scheduleMessage(
+            reservation.day!!,
+            reservation.startTime!!,
+            reservation
+        ) {
+            raspService.turnOnLight()
+        }
+        scheduler.scheduleMessage(
+            reservation.day!!,
+            reservation.endTime!!,
+            reservation
+        ) {
+            raspService.turnOffLight()
+            reservation.status = ReservationStatus.FINISHED
+            reservationRepository.save(reservation)
+        }
     }
 }

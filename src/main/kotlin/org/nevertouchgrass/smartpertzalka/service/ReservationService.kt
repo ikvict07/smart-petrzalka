@@ -67,14 +67,18 @@ class ReservationService(
         reservationRepository.save(reservation)
 
         val qr = qrCodeService.generateQRCode(reservation.uuid, 240, 240)
-        emailService.sendMessageWithAttachment(
-            "antongorobec101@gmail.com",
-            "Reservation",
-            "You have a reservation at ${reservation.playground?.name} on ${reservation.day} from ${reservation.startTime} to ${reservation.endTime}",
-            qr,
-            "qr.png"
-        )
-        syncReservationsService.sync()
+        try {
+            emailService.sendMessageWithAttachment(
+                email,
+                "Reservation",
+                "You have a reservation at ${reservation.playground?.name} on ${reservation.day} from ${reservation.startTime} to ${reservation.endTime}",
+                qr,
+                "qr.png"
+            )
+        } catch (e: Exception) {
+            println("Error sending email")
+        }
+        syncReservationsService.sync(reservation)
         return reservation
     }
 
@@ -86,7 +90,8 @@ class ReservationService(
     }
 
     fun getAllReservationsForDay(playgroundName: String, day: LocalDate): List<Reservation> {
-        return reservationRepository.findByDay(day).filter { it.playground?.name == playgroundName }.filter { it.status == ReservationStatus.ACTIVE }
+        return reservationRepository.findByDay(day).filter { it.playground?.name == playgroundName }
+            .filter { it.status == ReservationStatus.ACTIVE }
     }
 
     fun getFreeTimes(playgroundName: String, day: LocalDate): List<OpenHours> {
@@ -137,7 +142,7 @@ class ReservationService(
     fun cancelReservation(id: Long): Boolean {
         val email = SecurityContextHolder.getContext().authentication.principal as String
         val user = userService.getUserByEmail(email) ?: return false
-        val reservations = reservationRepository.findByUser(user).filter { it.id == id }.forEach{
+        val reservations = reservationRepository.findByUser(user).filter { it.id == id }.forEach {
             it.status = ReservationStatus.CANCELLED
             reservationRepository.save(it)
         }
