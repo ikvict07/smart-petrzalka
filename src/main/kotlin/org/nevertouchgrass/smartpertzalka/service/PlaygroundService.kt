@@ -148,6 +148,10 @@ class PlaygroundService(
         }
     }
 
+    fun getPlaygroundByName(playgroundName: String): Playground? {
+        return playgroundRepository.findByName(playgroundName)
+    }
+
 }
 
 fun LocalTime.isBeforeE(time: LocalTime): Boolean {
